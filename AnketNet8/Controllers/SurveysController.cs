@@ -25,6 +25,11 @@ namespace AnketNet8.Controllers
             return View(await _context.Surveys.ToListAsync());
         }
 
+        public async Task<IActionResult> AlreadySubmitted()
+        {
+            return View();
+        }
+
         // GET: Surveys/Details/5
         public IActionResult Details(int id)
         {
@@ -47,11 +52,33 @@ namespace AnketNet8.Controllers
                 .Count();
 
             // Katılımcı sayısını ata
-            survey.ParticipantCount = uniqueParticipants; // Survey modeline bu alanı eklemeyi unutmayın
+            survey.ParticipantCount = uniqueParticipants;
+
+            // Her soru için yanıt yüzdelerini hesapla
+            foreach (var question in survey.Questions)
+            {
+                question.Responses = question.Responses ?? new List<Response>();
+
+                // Sadece çoktan seçmeli ve önceden tanımlı sorular için yüzdeleri hesapla
+                if (question.Type == QuestionType.MultipleChoice || question.Type == QuestionType.PredefinedChoice)
+                {
+                    if (!string.IsNullOrEmpty(question.Options))
+                    {
+                        var options = question.Options.Split(';');
+                        var totalResponses = question.Responses.Count();
+
+                        question.Options = string.Join(";", options.Select(option =>
+                        {
+                            var responseCount = question.Responses.Count(r => r.SelectedOption == option);
+                            var percentage = totalResponses > 0 ? (double)responseCount / totalResponses * 100 : 0;
+                            return $"{option} - {percentage:F2}%"; // İki ondalık basamak ile göster
+                        }));
+                    }
+                }
+            }
 
             return View(survey);
         }
-
         // GET: Surveys/Create
         public IActionResult Create()
         {
@@ -211,9 +238,16 @@ namespace AnketNet8.Controllers
         }
         public async Task<IActionResult> Solve(int id)
         {
+            // Çerezi kontrol et: Eğer daha önce çözülmüşse bir hata veya uyarı sayfasına yönlendirin
+            if (Request.Cookies.ContainsKey($"survey_{id}_completed"))
+            {
+                TempData["Message"] = "Bu anketi daha önce çözdünüz.";
+                return RedirectToAction("AlreadySubmitted");
+            }
+
             var survey = await _context.Surveys
                 .Include(s => s.Questions)
-                .ThenInclude(q => q.Responses) // Eğer ihtiyaç varsa yanıtları da dahil et
+                .ThenInclude(q => q.Responses)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (survey == null)
@@ -224,65 +258,74 @@ namespace AnketNet8.Controllers
             return View(survey);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SubmitResponses(Dictionary<string, string> responses)
+
+        public async Task<IActionResult> Thanks(int id)
         {
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitResponses(int SurveyId, Dictionary<string, string> responses)
+        {
+            var survey = await _context.Surveys
+                .Include(s => s.Questions)
+                .FirstOrDefaultAsync(s => s.Id == SurveyId);
+
+            if (survey == null)
+            {
+                return NotFound();
+            }
+
+            // Gelen yanıtları işle
             foreach (var response in responses)
             {
-                // Anahtarın doğru formatta olup olmadığını kontrol edin
                 if (response.Key.StartsWith("response_"))
                 {
-                    // response.Key = "response_1", bu yüzden '_' karakterinden sonra gelen kısmı alıyoruz
                     var questionIdStr = response.Key.Split('_')[1];
                     if (int.TryParse(questionIdStr, out int questionId))
                     {
                         var selectedOption = response.Value;
-
-                        // Yeni bir yanıt oluşturun ve veritabanına kaydedin
                         var answer = new Response
                         {
                             QuestionId = questionId,
                             SelectedOption = selectedOption
-                            // Eğer metin yanıtı varsa, buraya ekleyebilirsiniz
                         };
-
                         _context.Responses.Add(answer);
                     }
-                    else
-                    {
-                        // Hatalı soru ID'si durumu için hata işlemleri
-                        ModelState.AddModelError(string.Empty, "Geçersiz soru ID'si: " + questionIdStr);
-                    }
                 }
-                if (response.Key.StartsWith("TextResponse_"))
+                else if (response.Key.StartsWith("TextResponse_"))
                 {
-                    // response.Key = "response_1", bu yüzden '_' karakterinden sonra gelen kısmı alıyoruz
                     var questionIdStr = response.Key.Split('_')[1];
                     if (int.TryParse(questionIdStr, out int questionId))
                     {
                         var textResponse = response.Value;
-
-                        // Yeni bir yanıt oluşturun ve veritabanına kaydedin
                         var answer = new Response
                         {
                             QuestionId = questionId,
                             TextResponse = textResponse
-                            // Eğer metin yanıtı varsa, buraya ekleyebilirsiniz
                         };
-
                         _context.Responses.Add(answer);
-                    }
-                    else
-                    {
-                        // Hatalı soru ID'si durumu için hata işlemleri
-                        ModelState.AddModelError(string.Empty, "Geçersiz soru ID'si: " + questionIdStr);
                     }
                 }
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index)); // Yanıtlar gönderildikten sonra liste sayfasına yönlendirin
+
+            // Anket çözüldükten sonra çerezi oluştur
+            Response.Cookies.Append(
+                $"survey_{SurveyId}_completed",
+                "true",
+                new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddMonths(1) // Çerezi bir ay boyunca saklar
+                }
+            );
+
+            return RedirectToAction("Thanks");
         }
+
+
 
         private bool SurveyExists(int id)
         {

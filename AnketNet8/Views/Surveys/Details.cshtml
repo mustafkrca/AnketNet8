@@ -1,48 +1,162 @@
 ﻿@model Survey
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Ayrıntılar";
 }
 
-<h1>Details</h1>
+
+
+
+<div class="container">
+    <div class="row">
+            <div class="col-12 mb-3">
+                <div class="card rounded" style="background-color: #e1e8ed; border: none;">
+                    <div class="card-body header justify-content-between align-items-center">
+                        <div class="header align-items-center">
+                            <div class="badge bg-primary text-white me-3" style="font-size: 2rem; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                                @Model.Title.Substring(0, 2).ToUpper() <!-- Display first two letters as in the design -->
+                            </div>
+                            <div>
+                            <h3 class="card-title mb-1">@Html.DisplayFor(model => model.Title)</h3>
+                            <h5 class="card-title mb-1">Katılımcı : @Model.ParticipantCount</h5>
+                            <p class="card-text mb-0">@Html.DisplayFor(model => model.CreatedDate)</p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
 
 <div>
-    <h4>Survey</h4>
+    <h4>Sorular</h4>
     <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.CreatedDate)
-        </dd>
-        <dt class="col-sm-2">
-            Katılımcı Sayısı
-        </dt>
-        <dd class="col-sm-10">
-            @Model.ParticipantCount
-        </dd>
-    </dl>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Soru</th>
+                <th>Seçenekler ve Yanıt Yüzdeleri</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var question in Model.Questions)
+            {
+                <tr>
+                    <td><strong>@question.Text</strong></td>
+                    <td>
+                        @if (question.Type == QuestionType.MultipleChoice || question.Type == QuestionType.PredefinedChoice)
+                        {
+                            <div class="d-flex flex-wrap">
+                                @if (!string.IsNullOrEmpty(question.Options))
+                                {
+                                    var options = question.Options.Split(';');
+                                    var totalResponses = question.Responses.Count();
+
+                                    // Pasta grafiği için verileri hesapla
+                                    int olumlu = question.Responses.Count(r => r.SelectedOption == "Kesinlikle Katılıyorum" || r.SelectedOption == "Katılıyorum");
+                                    int kararsız = question.Responses.Count(r => r.SelectedOption == "Kararsızım");
+                                    int olumsuz = question.Responses.Count(r => r.SelectedOption == "Kesinlikle Katılmıyorum" || r.SelectedOption == "Katılmıyorum");
+
+                                    foreach (var option in options)
+                                    {
+                                        var responseCount = question.Responses.Count(r => r.SelectedOption == option);
+                                        var percentage = totalResponses > 0 ? (double)responseCount / totalResponses * 100 : 0;
+                                        var yuzde = option.Split("-")[1]; // Yüzde formatlama
+                                        var optionText = option.Split("-")[0];
+
+                                        <div class="me-4 text-center">
+                                            <a>@optionText</a>
+                                            <br />
+                                            <strong>@yuzde</strong>
+                                        </div>
+                                    }
+
+                                    // Pasta grafiği ekleme
+                                    <div class="col-2 text-center">
+                                        <!-- Bootstrap sınıfı ile genişlik ayarı -->
+                                        <canvas id="chart-@question.Id" width="100" height="100" style="max-width: 100%;"></canvas>
+                                    </div>
+                                    <script>
+                                        var ctx = document.getElementById('chart-@question.Id').getContext('2d');
+                                        var chart = new Chart(ctx, {
+                                            type: 'pie',
+                                            data: {
+                                                labels: ['Olumlu', 'Kararsız', 'Olumsuz'],
+                                                datasets: [{
+                                                    label: 'Yanıtlar',
+                                                    data: [@olumlu, @kararsız, @olumsuz],
+                                                    backgroundColor: ['#3abd48', '#d1e0d2', '#FF6384']
+                                                }]
+                                            },
+                                            options: {
+                                                responsive: true,
+                                                plugins: {
+                                                    legend: {
+                                                        display: false, // Legend'ı gizle
+                                                    },
+                                                }
+                                            }
+                                        });
+                                    </script>
+                                }
+                                else
+                                {
+                                    <span>Seçenek mevcut değil</span>
+                                }
+                            </div>
+                        }
+                        else if (question.Type == QuestionType.TextResponse)
+                        {
+                            <em>Metin Yanıtları:</em>
+                            <ul>
+                                @foreach (var response in question.Responses)
+                                {
+                                    if (!string.IsNullOrEmpty(response.TextResponse))
+                                    {
+                                        <li>@response.TextResponse</li>
+                                    }
+                                }
+                            </ul>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 
 <div>
-    <h4>Questions</h4>
-    <hr />
-    @foreach (var question in Model.Questions)
-    {
-        <div>
-            <strong>@question.Text</strong>
-        </div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Düzenle</a> |
+    <a asp-action="Index">Listeye Dön</a>
+</div>
+
+<style>
+    /* Tablo tasarımı için isteğe bağlı stiller */
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
     }
-</div>
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+    .table td {
+        vertical-align: top; /* Yukarı hizala */
+    }
+
+    .d-flex {
+        display: flex;
+        flex-wrap: nowrap; /* Seçeneklerin aynı satırda kalmasını sağlamak için */
+        overflow-x: auto; /* Taşma durumunda yatay kaydırma çubuğu gösterir */
+    }
+
+    .d-flex > div {
+        white-space: normal; /* Metnin alt satıra geçmesine izin verir */
+        max-width: 100px; /* Genişliği kontrol etmek için maksimum genişlik */
+        text-align: center; /* Ortalamak için */
+    }
+    .header {
+        display : flex;
+        
+    }
+</style>
