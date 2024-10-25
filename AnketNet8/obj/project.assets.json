@@ -7722,11 +7722,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\musta\\source\\repos\\AnketNet8\\AnketNet8\\AnketNet8.csproj",
+      "projectUniqueName": "C:\\Users\\musta\\Documents\\GitHub\\AnketNet8\\AnketNet8\\AnketNet8.csproj",
       "projectName": "AnketNet8",
-      "projectPath": "C:\\Users\\musta\\source\\repos\\AnketNet8\\AnketNet8\\AnketNet8.csproj",
+      "projectPath": "C:\\Users\\musta\\Documents\\GitHub\\AnketNet8\\AnketNet8\\AnketNet8.csproj",
       "packagesPath": "C:\\Users\\musta\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\musta\\source\\repos\\AnketNet8\\AnketNet8\\obj\\",
+      "outputPath": "C:\\Users\\musta\\Documents\\GitHub\\AnketNet8\\AnketNet8\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

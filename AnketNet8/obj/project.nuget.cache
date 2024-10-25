@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "0cDdOMSO9co=",
+  "dgSpecHash": "AN9Rq79nGuM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\musta\\source\\repos\\AnketNet8\\AnketNet8\\AnketNet8.csproj",
+  "projectFilePath": "C:\\Users\\musta\\Documents\\GitHub\\AnketNet8\\AnketNet8\\AnketNet8.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\musta\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\musta\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
