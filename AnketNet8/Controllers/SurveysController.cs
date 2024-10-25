@@ -7,9 +7,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AnketNet8.Data;
 using AnketNet8.Models;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace AnketNet8.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class SurveysController : Controller
     {
         private readonly SurveyContext _context;
@@ -19,12 +24,25 @@ namespace AnketNet8.Controllers
             _context = context;
         }
 
+        public async Task<IActionResult> AdminDashboard()
+        {
+            return View(await _context.Surveys.ToListAsync());
+        }
+
         // GET: Surveys
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Surveys.ToListAsync());
         }
 
+        [AllowAnonymous]
+        public async Task<IActionResult> AdminLogin()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
         public async Task<IActionResult> AlreadySubmitted()
         {
             return View();
@@ -96,7 +114,7 @@ namespace AnketNet8.Controllers
             {
                 _context.Add(survey);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("AdminDashboard");
             }
             return View(survey);
         }
@@ -153,7 +171,7 @@ namespace AnketNet8.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("AdminDashboard");
             }
             return View(survey);
         }
@@ -188,7 +206,7 @@ namespace AnketNet8.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("AdminDashboard");
         }
 
 
@@ -236,6 +254,8 @@ namespace AnketNet8.Controllers
             // Kullanıcıyı düzenleme sayfasına yönlendir, aynı anket ile
             return RedirectToAction("Edit", new { id = question.SurveyId }); // Belirli bir anketin düzenleme sayfasına yönlendirme
         }
+
+        [AllowAnonymous]
         public async Task<IActionResult> Solve(int id)
         {
             // Çerezi kontrol et: Eğer daha önce çözülmüşse bir hata veya uyarı sayfasına yönlendirin
@@ -258,6 +278,7 @@ namespace AnketNet8.Controllers
             return View(survey);
         }
 
+        [AllowAnonymous]
 
         public async Task<IActionResult> Thanks(int id)
         {
@@ -266,6 +287,8 @@ namespace AnketNet8.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
+
         public async Task<IActionResult> SubmitResponses(int SurveyId, Dictionary<string, string> responses)
         {
             var survey = await _context.Surveys
@@ -325,7 +348,40 @@ namespace AnketNet8.Controllers
             return RedirectToAction("Thanks");
         }
 
+        [HttpPost]
+        [AllowAnonymous]
 
+        public async Task<IActionResult> AdminLogin(string username, string password)
+        {
+            var adminUser = await _context.Admins
+                                           .FirstOrDefaultAsync(u => u.Username == username && u.Password == password); // Üretimde şifreyi hashleyin!
+
+            if (adminUser != null)
+            {
+                // Kullanıcı bulundu, oturumu başlat
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, adminUser.Username),
+            new Claim(ClaimTypes.Role, "Admin")
+        };
+
+                var claimsIdentity = new ClaimsIdentity(claims, "AdminAuth");
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                // Varsayılan şemayı belirtin
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+
+                return RedirectToAction("AdminDashboard");
+            }
+
+            // Geçersiz giriş denemesi
+            ModelState.AddModelError(string.Empty, "Kullanıcı adı veya şifre hatalı.");
+            return View();
+        }
+
+
+
+        [AllowAnonymous]
 
         private bool SurveyExists(int id)
         {

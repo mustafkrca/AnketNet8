@@ -12,6 +12,8 @@ namespace AnketNet8.Data
         public DbSet<Survey> Surveys { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Response> Responses { get; set; }
+        public DbSet<Admin> Admins { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,6 +28,10 @@ namespace AnketNet8.Data
                 .HasMany(q => q.Responses)
                 .WithOne(r => r.Question)
                 .HasForeignKey(r => r.QuestionId);
+
+
+            modelBuilder.Entity<Admin>().ToTable("Admins");
+
         }
     }
 }

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AnketNet8")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+48337b3e930f605cf638ab42a82b52af87347717")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+37f57e140ada33a09254cbc39085832ec1b674f7")]
 [assembly: System.Reflection.AssemblyProductAttribute("AnketNet8")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AnketNet8")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

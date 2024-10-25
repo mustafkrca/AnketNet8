@@ -1,11 +1,14 @@
 ﻿@model IEnumerable<Survey>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Dashboard";
 }
 
 <h1>Anketler</h1>
 
+<p>
+    <a asp-action="Create" class="btn btn-danger"><i class="fas fa-plus"></i> Anket Oluştur</a>
+</p>
 
 <div class="container">
     <div class="row">
@@ -24,7 +27,15 @@
                             </div>
                         </div>
                         <div>
-                            
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary me-2" title="Edit">
+                                <i class="fas fa-edit"></i> <!-- Edit Icon -->
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary me-2" title="Details">
+                                <i class="fas fa-info-circle"></i> <!-- Details Icon -->
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger me-2" title="Delete">
+                                <i class="fas fa-trash-alt"></i> <!-- Delete Icon -->
+                            </a>
                             <a asp-action="Solve" asp-route-id="@item.Id" class="btn btn-sm btn-outline-success" title="Çözüm">
                                 <i class="fas fa-check"></i> <!-- Solve Icon -->
                             </a>

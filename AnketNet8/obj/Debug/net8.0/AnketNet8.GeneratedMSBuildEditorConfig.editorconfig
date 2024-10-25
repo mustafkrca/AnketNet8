@@ -34,6 +34,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/musta/Documents/GitHub/AnketNet8/AnketNet8/Views/Surveys/AdminDashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VydmV5c1xBZG1pbkRhc2hib2FyZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/musta/Documents/GitHub/AnketNet8/AnketNet8/Views/Surveys/AdminLogin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VydmV5c1xBZG1pbkxvZ2luLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/musta/Documents/GitHub/AnketNet8/AnketNet8/Views/Surveys/AlreadySubmitted.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VydmV5c1xBbHJlYWR5U3VibWl0dGVkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

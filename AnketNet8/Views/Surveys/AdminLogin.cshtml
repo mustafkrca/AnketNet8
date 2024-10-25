@@ -1,0 +1,22 @@
+﻿@model AnketNet8.Models.Admin
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="wrapper bg-light p-4 rounded shadow">
+        <div class="text-center">
+            <img src="https://www.toki.gov.tr/satis/images/toki-logo.png" alt="Logo" class="mb-3" style="width:100px;height: 80px;">
+            <h2 class="mb-4">Yönetici Girişi</h2>
+        </div>
+        <form method="post" asp-action="AdminLogin">
+            <div class="mb-3">
+                <label for="userName" class="form-label">Kullanıcı Adı</label>
+                <input type="text" class="form-control" name="Username" id="userName" placeholder="Kullanıcı Adı" required>
+            </div>
+            <div class="mb-3">
+                <label for="pwd" class="form-label">Şifre</label>
+                <input type="password" class="form-control" name="Password" id="pwd" placeholder="Şifre" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Giriş Yap</button>
+        </form>
+
+    </div>
+</div>
