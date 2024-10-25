@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Survey>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Anketler</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-danger"><i class="fas fa-plus"></i> Anket Oluştur</a>
+</p>
+
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-12 mb-3">
+                <div class="card rounded" style="background-color: #e1e8ed; border: none;">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="badge bg-primary text-white me-3" style="font-size: 1.5rem; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                @item.Title.Substring(0, 2).ToUpper() <!-- Display first two letters as in the design -->
+                            </div>
+                            <div>
+                                <h5 class="card-title mb-1">@Html.DisplayFor(modelItem => item.Title)</h5>
+                                <p class="card-text mb-0">@Html.DisplayFor(modelItem => item.CreatedDate)</p>
+                            </div>
+                        </div>
+                        <div>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary me-2" title="Edit">
+                                <i class="fas fa-edit"></i> <!-- Edit Icon -->
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary me-2" title="Details">
+                                <i class="fas fa-info-circle"></i> <!-- Details Icon -->
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger me-2" title="Delete">
+                                <i class="fas fa-trash-alt"></i> <!-- Delete Icon -->
+                            </a>
+                            <a asp-action="Solve" asp-route-id="@item.Id" class="btn btn-sm btn-outline-success" title="Çözüm">
+                                <i class="fas fa-check"></i> <!-- Solve Icon -->
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

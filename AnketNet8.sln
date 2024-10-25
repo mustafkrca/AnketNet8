@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnketNet8", "AnketNet8\AnketNet8.csproj", "{1F91C92C-B364-4E96-85C2-F54E8AF4856E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F91C92C-B364-4E96-85C2-F54E8AF4856E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F91C92C-B364-4E96-85C2-F54E8AF4856E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F91C92C-B364-4E96-85C2-F54E8AF4856E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F91C92C-B364-4E96-85C2-F54E8AF4856E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2C2AD877-5AC6-4F08-A56E-F7CDE72D330C}
+	EndGlobalSection
+EndGlobal

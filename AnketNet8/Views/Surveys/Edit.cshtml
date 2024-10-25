@@ -1,0 +1,181 @@
+﻿@model Survey
+
+@{
+    ViewData["Title"] = "Düzenle";
+}
+
+<h1>Anketi Düzenle</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <div class="mb-3 d-flex align-items-center">
+                <!-- Survey Title -->
+                <div class="me-3 flex-grow-1">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input asp-for="Title" class="form-control" placeholder="Anket Başlığını Girin" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <!-- Survey Created Date -->
+                <div class="me-3 flex-grow-1">
+                    <label asp-for="CreatedDate" class="form-label"></label>
+                    <input asp-for="CreatedDate" class="form-control" type="date" />
+                    <span asp-validation-for="CreatedDate" class="text-danger"></span>
+                </div>
+
+                <!-- Save Button -->
+                <div>
+                    <input type="submit" value="Kaydet" class="btn btn-success me-2 mt-4" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12 mt-5">
+        <div class="mb-3">
+            <!-- Display Current Questions -->
+            <table class="table table-bordered table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>Soru Metni</th>
+                        <th>Seçenekler</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Questions != null && Model.Questions.Any())
+                    {
+                        foreach (var question in Model.Questions)
+                        {
+                            <tr>
+                                <td>@question.Text</td>
+                                <td>@(question.Type == QuestionType.MultipleChoice || question.Type == QuestionType.PredefinedChoice ? question.Options : "Yok")</td>
+                                <td>
+                                    <!-- Removed Edit Question button -->
+                                    <a asp-action="DeleteQuestion" asp-route-id="@question.Id" class="btn btn-sm btn-outline-danger" title="Soruyu Sil">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">Henüz soru eklenmemiş.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add New Question Section -->
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                Yeni Soru Ekle
+            </div>
+            <div class="card-body">
+                <form asp-action="AddQuestion" method="post">
+                    <input type="hidden" asp-for="Id" />
+
+                    <!-- Question Text -->
+                    <div class="mb-3">
+                        <label for="QuestionText" class="form-label">Soru Metni</label>
+                        <input type="text" name="QuestionText" id="QuestionText" class="form-control" placeholder="Soru metnini girin" required />
+                    </div>
+
+                    <!-- Question Type -->
+                    <div class="mb-3">
+                        <label for="QuestionType" class="form-label">Soru Tipi</label>
+                        <select name="QuestionType" id="QuestionType" class="form-select" required>
+                            <option value="1">Çoktan Seçmeli</option>
+                            <option value="2">Ön Tanımlı Seçim</option>
+                            <option value="3">Metin Cevabı</option>
+                        </select>
+                    </div>
+
+                    <!-- Dynamic Options (for choice-based questions) -->
+                    <div class="mb-3" id="OptionsContainer" style="display: none;">
+                        <label class="form-label">Seçenekler</label>
+                        <div id="OptionsList">
+                            <!-- Dynamic option inputs will be inserted here -->
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="AddOptionButton">
+                            <i class="fas fa-plus"></i> Seçenek Ekle
+                        </button>
+                    </div>
+
+                    <!-- Save Question Button -->
+                    <button type="submit" class="btn btn-primary mt-3">Soru Ekle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        // Show/Hide Options input based on Question Type selection
+        $(document).ready(function () {
+            $('#QuestionType').change(function () {
+                var selectedType = $(this).val();
+                $('#OptionsContainer').toggle(selectedType == "1" || selectedType == "2");
+
+                // Clear existing options if not needed
+                if (selectedType != "1" && selectedType != "2") {
+                    $('#OptionsList').empty(); // Clear options if not needed
+                } else if (selectedType == "1") {
+                    // Populate default options for Multiple Choice
+                    $('#OptionsList').empty(); // Clear existing options
+                    var defaultOptions = [
+                        "Kesinlikle Katılmıyorum",
+                        "Katılmıyorum",
+                        "Kararsızım",
+                        "Katılıyorum",
+                        "Kesinlikle Katılıyorum"
+                    ];
+                    defaultOptions.forEach(function (option) {
+                        var optionInput = `
+                                            <div class="input-group mb-2">
+                                                <input type="text" name="Options" class="form-control" value="${option}" required />
+                                                <button type="button" class="btn btn-outline-danger remove-option-btn">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>`;
+                        $('#OptionsList').append(optionInput);
+                    });
+                }
+            });
+
+            // Handle adding dynamic option fields
+            $('#AddOptionButton').click(function () {
+                var optionIndex = $('#OptionsList').children().length + 1;
+                var optionInput = `
+                                            <div class="input-group mb-2">
+                                                <input type="text" name="Options" class="form-control" placeholder="Seçenek ${optionIndex}" required />
+                                                <button type="button" class="btn btn-outline-danger remove-option-btn">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>`;
+                $('#OptionsList').append(optionInput);
+            });
+
+            // Handle removing an option field
+            $(document).on('click', '.remove-option-btn', function () {
+                $(this).closest('.input-group').remove();
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

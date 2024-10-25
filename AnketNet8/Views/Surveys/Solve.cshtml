@@ -1,0 +1,47 @@
+﻿@model Survey
+
+@{
+    ViewData["Title"] = "Anketi Çöz";
+}
+
+<h1>@Model.Title</h1>
+
+<div class="container">
+    <form asp-action="SubmitResponses" method="post">
+        @foreach (var question in Model.Questions)
+        {
+            <div class="mb-4">
+                <h5>@question.Text</h5>
+
+                @switch (question.Type)
+                {
+                    case QuestionType.MultipleChoice:
+                    case QuestionType.PredefinedChoice: // PredefinedChoice türü MultipleChoice ile aynı işlemi yapacak
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                @foreach (var option in question.Options.Split(';')) // Seçeneklerin noktalı virgülle ayrıldığını varsayıyoruz
+                                {
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" name="response_@question.Id" id="option_@question.Id@option" value="@option" required />
+                                        <label class="form-check-label" for="option_@question.Id@option">@option</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        break;
+
+                    case QuestionType.TextResponse:
+                        <textarea class="form-control" name="TextResponse_@question.Id" rows="4" placeholder="Cevabınızı buraya yazın..." required></textarea>
+                        break;
+
+                    default:
+                        <p>Geçersiz soru tipi.</p>
+                        break;
+                }
+            </div>
+        }
+
+        <button type="submit" class="btn btn-primary">Cevapları Gönder</button>
+        <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+    </form>
+</div>
